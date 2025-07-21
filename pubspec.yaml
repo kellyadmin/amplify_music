@@ -1,0 +1,47 @@
+name: amplify_music
+description: A Flutter Boomplay-style music app.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.1.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # UI & Fonts
+  cupertino_icons: ^1.0.8
+  google_fonts: ^6.1.0
+
+  # Audio Playback
+  just_audio: ^0.9.36
+  audioplayers: ^6.0.0
+  audio_session: ^0.1.16
+
+  # State Management & Storage
+  provider: ^6.0.5
+  shared_preferences: ^2.1.1
+
+  # File & Image Pickers
+  image_picker: ^1.0.4
+  file_picker: ^6.1.1
+  path: any
+
+  # Supabase
+  supabase_flutter: ^1.10.17
+
+  # Deep linking
+  uni_links: ^0.5.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/audio/

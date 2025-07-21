@@ -1,0 +1,30 @@
+{
+  "flutter": {
+    "platforms": {
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "amplifymusic-c0035",
+          "configurations": {
+            "ios": "1:196671810782:ios:00fa98dc2dc6f305a1664f",
+            "macos": "1:196671810782:ios:00fa98dc2dc6f305a1664f",
+            "windows": "1:196671810782:web:420eedd81184fcb0a1664f"
+          }
+        }
+      }
+    }
+  },
+  "hosting": {
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}
