@@ -15,13 +15,14 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.19.6'  # ✅ Make sure this is >= 3.10
+          channel: stable
+          cache: true
 
       - name: Install dependencies
         run: flutter pub get
 
       - name: Build Flutter web
-        run: flutter build web
+        run: flutter build web --release
 
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
