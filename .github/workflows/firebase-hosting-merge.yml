@@ -6,33 +6,27 @@ on:
       - main
 
 jobs:
-  build-and-deploy:
+  build_and_deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout your code
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      # 2. Install Flutter
-      - name: Setup Flutter
+      - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.10.5'  # Use your Flutter version here
+          flutter-version: '3.19.6'  # ✅ Make sure this is >= 3.10
 
-      # 3. Get Flutter dependencies
       - name: Install dependencies
         run: flutter pub get
 
-      # 4. Build Flutter Web Release
-      - name: Build web
-        run: flutter build web --release
+      - name: Build Flutter web
+        run: flutter build web
 
-      # 5. Deploy to Firebase Hosting
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
           firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_AMPLIFYMUSIC_C0035 }}"
           channelId: live
-          projectId: amplify-music  # Replace with your actual Firebase project ID if different
+          projectId: amplifymusic-c0035
