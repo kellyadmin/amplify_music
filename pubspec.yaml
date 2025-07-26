@@ -14,6 +14,9 @@ dependencies:
   cupertino_icons: ^1.0.8
   google_fonts: ^6.1.0
 
+  # Smooth page indicator for banner dots
+  smooth_page_indicator: ^1.0.0
+
   # Audio Playback
   just_audio: ^0.9.36
   audioplayers: ^6.0.0
@@ -33,6 +36,10 @@ dependencies:
 
   # Deep linking
   uni_links: ^0.5.1
+
+  # 🔥 NEW: Local Songs
+  on_audio_query: ^2.9.0
+  permission_handler: ^11.3.0
 
 dev_dependencies:
   flutter_test:

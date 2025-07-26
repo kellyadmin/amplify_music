@@ -1,85 +1,90 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:uni_links/uni_links.dart'; // only works on mobile
+import 'auth_screen.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
-  final String? token; // For web
+  final String token;
 
-  const ResetPasswordScreen({super.key, this.token});
+  const ResetPasswordScreen({super.key, required this.token});
 
   @override
   State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
 }
 
 class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
-  final supabase = Supabase.instance.client;
-  final TextEditingController _passwordController = TextEditingController();
-  bool loading = false;
-  bool sessionSet = false;
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+  String? _error;
+  bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    if (kIsWeb) {
-      _handleWebToken();
-    } else {
-      _handleMobileLink();
-    }
+    _setSessionWithToken(widget.token);
   }
 
-  Future<void> _handleWebToken() async {
-    final token = Uri.base.queryParameters['access_token'] ?? widget.token;
-    if (token == null) return;
+  Future<void> _setSessionWithToken(String token) async {
     try {
-      await supabase.auth.exchangeCodeForSession(token);
-      setState(() => sessionSet = true);
+      final supabase = Supabase.instance.client;
+      await supabase.auth.setSession(token);
     } catch (e) {
-      _showError("Web session error: $e");
+      setState(() => _error = 'Failed to authenticate session.');
     }
   }
 
-  Future<void> _handleMobileLink() async {
-    final uri = await getInitialUri();
-    if (uri != null) {
-      try {
-        await supabase.auth.exchangeCodeForSession(uri.toString());
-        setState(() => sessionSet = true);
-      } catch (e) {
-        _showError("Mobile session error: $e");
-      }
-    }
-  }
+  Future<void> _resetPassword() async {
+    final password = _passwordController.text.trim();
+    final confirmPassword = _confirmPasswordController.text.trim();
 
-  Future<void> _updatePassword() async {
-    final newPassword = _passwordController.text.trim();
-
-    if (newPassword.length < 6) {
-      _showError("Password must be at least 6 characters");
+    if (password.isEmpty || confirmPassword.isEmpty) {
+      setState(() => _error = 'Please fill in both fields');
       return;
     }
 
-    setState(() => loading = true);
+    if (password != confirmPassword) {
+      setState(() => _error = 'Passwords do not match');
+      return;
+    }
+
+    if (password.length < 6) {
+      setState(() => _error = 'Password must be at least 6 characters');
+      return;
+    }
+
+    setState(() {
+      _error = null;
+      _isLoading = true;
+    });
 
     try {
-      await supabase.auth.updateUser(UserAttributes(password: newPassword));
+      final response = await Supabase.instance.client.auth.updateUser(
+        UserAttributes(password: password),
+      );
 
-      _showError("Password updated successfully. Please log in again.");
-      if (context.mounted) Navigator.pop(context);
+      // No exception field, check response error by catching exceptions
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Password reset successful')),
+      );
+
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const AuthScreen()),
+      );
+    } on AuthException catch (error) {
+      setState(() => _error = error.message);
     } catch (e) {
-      _showError("Error updating password: $e");
+      setState(() => _error = 'Unexpected error: $e');
     } finally {
-      setState(() => loading = false);
+      setState(() => _isLoading = false);
     }
-  }
-
-  void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
   void dispose() {
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -87,42 +92,77 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      appBar: AppBar(title: const Text('Reset Password')),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              'Enter your new password',
-              style: TextStyle(color: Colors.white, fontSize: 18),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                const Text(
+                  'Reset Your Password',
+                  style: TextStyle(
+                    color: Colors.yellow,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 30),
+                TextField(
+                  controller: _passwordController,
+                  obscureText: true,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    labelText: 'New Password',
+                    labelStyle: const TextStyle(color: Colors.white70),
+                    filled: true,
+                    fillColor: Colors.white10,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _confirmPasswordController,
+                  obscureText: true,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    labelText: 'Confirm Password',
+                    labelStyle: const TextStyle(color: Colors.white70),
+                    filled: true,
+                    fillColor: Colors.white10,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                if (_error != null)
+                  Text(
+                    _error!,
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _isLoading ? null : _resetPassword,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.yellow,
+                      foregroundColor: Colors.black,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: _isLoading
+                        ? const CircularProgressIndicator(color: Colors.black)
+                        : const Text('Reset Password'),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 20),
-            TextField(
-              controller: _passwordController,
-              obscureText: true,
-              style: const TextStyle(color: Colors.white),
-              decoration: const InputDecoration(
-                labelText: 'New Password',
-                labelStyle: TextStyle(color: Colors.white70),
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: (loading || !sessionSet) ? null : _updatePassword,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.yellow,
-                minimumSize: const Size.fromHeight(50),
-              ),
-              child: loading
-                  ? const CircularProgressIndicator(color: Colors.black)
-                  : const Text(
-                'Update Password',
-                style: TextStyle(color: Colors.black, fontSize: 16),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

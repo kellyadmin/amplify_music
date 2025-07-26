@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:on_audio_query/on_audio_query.dart';
+import 'package:permission_handler/permission_handler.dart';
+
 import '../models.dart';
 import 'music_player_screen.dart';
 
@@ -12,6 +15,8 @@ class LibraryScreen extends StatefulWidget {
 class _LibraryScreenState extends State<LibraryScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final Color goldColor = const Color(0xFFFFD700);
+  final OnAudioQuery _audioQuery = OnAudioQuery();
+  List<SongModel> localSongs = [];
 
   final List<Song> downloadedSongs = [
     Song(
@@ -74,7 +79,17 @@ class _LibraryScreenState extends State<LibraryScreen> with SingleTickerProvider
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
+    requestPermissionAndLoadSongs();
+  }
+
+  Future<void> requestPermissionAndLoadSongs() async {
+    if (await Permission.audio.request().isGranted || await Permission.storage.request().isGranted) {
+      final songs = await _audioQuery.querySongs();
+      setState(() {
+        localSongs = songs;
+      });
+    }
   }
 
   @override
@@ -118,6 +133,28 @@ class _LibraryScreenState extends State<LibraryScreen> with SingleTickerProvider
     );
   }
 
+  Widget _buildLocalCard(SongModel song) {
+    return Card(
+      color: const Color(0xFF1E1E1E),
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: ListTile(
+        leading: QueryArtworkWidget(
+          id: song.id,
+          type: ArtworkType.AUDIO,
+          artworkBorder: BorderRadius.circular(8),
+          nullArtworkWidget: const Icon(Icons.music_note, size: 40, color: Colors.white54),
+        ),
+        title: Text(song.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        subtitle: Text(song.artist ?? "Unknown", style: const TextStyle(color: Colors.white70)),
+        trailing: Icon(Icons.play_circle_fill, color: goldColor, size: 32),
+        onTap: () {
+          // play using just_audio or any player screen
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -138,6 +175,7 @@ class _LibraryScreenState extends State<LibraryScreen> with SingleTickerProvider
             Tab(text: "Downloaded"),
             Tab(text: "Liked"),
             Tab(text: "Recent"),
+            Tab(text: "Local"),
           ],
         ),
       ),
@@ -179,6 +217,11 @@ class _LibraryScreenState extends State<LibraryScreen> with SingleTickerProvider
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   itemCount: recentSongs.length,
                   itemBuilder: (context, index) => _buildSongCard(recentSongs, index),
+                ),
+                ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  itemCount: localSongs.length,
+                  itemBuilder: (context, index) => _buildLocalCard(localSongs[index]),
                 ),
               ],
             ),

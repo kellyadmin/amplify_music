@@ -14,6 +14,7 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   final supabase = Supabase.instance.client;
 
+  // Hardcoded song list, can be replaced with Supabase data later
   final List<Song> allSongs = [
     Song(
       id: '1',
@@ -41,28 +42,32 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _checkAuth();
+    _checkAuthStatus();
   }
 
-  Future<void> _checkAuth() async {
+  Future<void> _checkAuthStatus() async {
     await Future.delayed(const Duration(seconds: 2));
+
     final user = supabase.auth.currentUser;
 
-    if (user != null) {
-      if (user.emailConfirmedAt == null) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const AuthScreen(showResend: true)),
-        );
-      } else {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => AmplifyMainScreen(allSongs: allSongs, isArtist: true)),
-        );
-      }
+    if (!mounted) return;
+
+    if (user == null) {
+      // Not logged in
+      _navigateTo(const AuthScreen());
+    } else if (user.emailConfirmedAt == null) {
+      // Logged in but email not confirmed
+      _navigateTo(const AuthScreen(showResend: true));
     } else {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const AuthScreen()),
-      );
+      // Logged in and email confirmed
+      _navigateTo(AmplifyMainScreen(allSongs: allSongs, isArtist: true));
     }
+  }
+
+  void _navigateTo(Widget screen) {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => screen),
+    );
   }
 
   @override

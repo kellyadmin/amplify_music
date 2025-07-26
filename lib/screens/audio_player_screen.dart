@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
-import '../models.dart'; // Correct import for Song
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../models.dart';
+import 'auth_screen.dart'; // ✅ Needed for login redirect
 
 class AudioPlayerScreen extends StatefulWidget {
   final Song song;
@@ -14,6 +16,7 @@ class AudioPlayerScreen extends StatefulWidget {
 class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
   late AudioPlayer _player;
   bool _isPlaying = false;
+  final supabase = Supabase.instance.client;
 
   @override
   void initState() {
@@ -24,7 +27,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
 
   Future<void> _initializePlayer() async {
     try {
-      await _player.setUrl(widget.song.url); // ✅ Correct field name
+      await _player.setUrl(widget.song.url);
       await _player.play();
       setState(() {
         _isPlaying = true;
@@ -45,6 +48,21 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
     });
   }
 
+  void _handleProtectedAction(Function onConfirmed) {
+    final user = supabase.auth.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please log in to use this feature.")),
+      );
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const AuthScreen()),
+      );
+    } else {
+      onConfirmed();
+    }
+  }
+
   @override
   void dispose() {
     _player.dispose();
@@ -58,11 +76,36 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
       appBar: AppBar(
         title: Text(widget.song.title),
         backgroundColor: Colors.black,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.favorite_border),
+            onPressed: () {
+              _handleProtectedAction(() {
+                // TODO: Implement like logic
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Liked!")),
+                );
+              });
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.download_rounded),
+            onPressed: () {
+              _handleProtectedAction(() {
+                // TODO: Implement download logic
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Download started")),
+                );
+              });
+            },
+          ),
+        ],
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          if (widget.song.albumArtUrl != null && widget.song.albumArtUrl!.isNotEmpty)
+          if (widget.song.albumArtUrl != null &&
+              widget.song.albumArtUrl!.isNotEmpty)
             Padding(
               padding: const EdgeInsets.all(20),
               child: ClipRRect(
@@ -72,8 +115,11 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                   height: 250,
                   width: 250,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) =>
-                  const Icon(Icons.music_note, size: 100, color: Colors.white),
+                  errorBuilder: (_, __, ___) => const Icon(
+                    Icons.music_note,
+                    size: 100,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
