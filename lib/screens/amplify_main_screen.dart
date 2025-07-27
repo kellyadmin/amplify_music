@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'home_screen.dart';
 import 'discover_screen.dart';
 import 'library_screen.dart';
 import 'profile_screen.dart';
+import 'auth_screen.dart';
 import '../models.dart';
 import 'artist_dashboard_screen.dart';
 import 'admin_upload_screen.dart';
@@ -33,6 +35,8 @@ class _AmplifyMainScreenState extends State<AmplifyMainScreen>
 
   late final List<Widget> _screens;
 
+  final supabase = Supabase.instance.client;
+
   @override
   void initState() {
     super.initState();
@@ -41,14 +45,31 @@ class _AmplifyMainScreenState extends State<AmplifyMainScreen>
       HomeScreen(allSongs: widget.allSongs ?? []),
       const DiscoverScreen(),
       const LibraryScreen(),
-      const ProfileScreen(),
+      const ProfileScreen(), // Will only show if logged in
     ];
 
     _pageController = PageController(initialPage: _currentIndex);
   }
 
-  void _onTap(int index) {
+  void _onTap(int index) async {
+    if (index == 3 && supabase.auth.currentUser == null) {
+      // Not logged in and trying to go to Profile
+      final didLogin = await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const AuthScreen()),
+      );
+
+      if (didLogin == true && mounted) {
+        // Move to profile after successful login
+        setState(() => _currentIndex = 3);
+        _pageController.jumpToPage(3);
+      }
+
+      return;
+    }
+
     if (_currentIndex == index) return;
+
     setState(() => _currentIndex = index);
     _pageController.animateToPage(
       index,
@@ -66,8 +87,7 @@ class _AmplifyMainScreenState extends State<AmplifyMainScreen>
   @override
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final Color inactiveColor =
-    isDarkMode ? Colors.white54 : Colors.grey[600]!;
+    final Color inactiveColor = isDarkMode ? Colors.white54 : Colors.grey[600]!;
 
     return Scaffold(
       extendBodyBehindAppBar: false,
@@ -76,10 +96,10 @@ class _AmplifyMainScreenState extends State<AmplifyMainScreen>
         elevation: 4,
         centerTitle: false,
         title: Row(
-          children: [
-            const Icon(Icons.graphic_eq_rounded, color: Colors.amber, size: 28),
-            const SizedBox(width: 8),
-            const Text(
+          children: const [
+            Icon(Icons.graphic_eq_rounded, color: Colors.amber, size: 28),
+            SizedBox(width: 8),
+            Text(
               'Amplify Music',
               style: TextStyle(
                 color: Colors.white,
@@ -101,7 +121,9 @@ class _AmplifyMainScreenState extends State<AmplifyMainScreen>
             icon: const Icon(Icons.notifications_none),
             color: Colors.white,
             tooltip: "Notifications",
-            onPressed: () {},
+            onPressed: () {
+              // TODO: handle notifications
+            },
           ),
           if (widget.isArtist) ...[
             IconButton(
@@ -111,8 +133,7 @@ class _AmplifyMainScreenState extends State<AmplifyMainScreen>
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (_) => const ArtistDashboardScreen()),
+                  MaterialPageRoute(builder: (_) => const ArtistDashboardScreen()),
                 );
               },
             ),
@@ -147,14 +168,10 @@ class _AmplifyMainScreenState extends State<AmplifyMainScreen>
         unselectedFontSize: 12,
         elevation: 12,
         items: const [
-          BottomNavigationBarItem(
-              icon: Icon(Icons.home_rounded), label: 'Home'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.explore_rounded), label: 'Discover'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.library_music), label: 'Library'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline_rounded), label: 'Profile'),
+          BottomNavigationBarItem(icon: Icon(Icons.home_rounded), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.explore_rounded), label: 'Discover'),
+          BottomNavigationBarItem(icon: Icon(Icons.library_music), label: 'Library'),
+          BottomNavigationBarItem(icon: Icon(Icons.person_outline_rounded), label: 'Profile'),
         ],
       ),
     );

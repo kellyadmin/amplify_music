@@ -1,5 +1,3 @@
-// lib/models.dart
-
 class Song {
   final String id;
   final String title;
@@ -68,6 +66,11 @@ class Song {
       downloads: downloads ?? this.downloads,
     );
   }
+
+  @override
+  String toString() {
+    return 'Song(id: $id, title: $title, artist: $artist, plays: $playCount, likes: $likes, downloads: $downloads)';
+  }
 }
 
 class Artist {
@@ -78,6 +81,7 @@ class Artist {
   final int followers;
   final int following;
   final int downloads;
+  final bool verified;
   final List<Song> songs;
 
   Artist({
@@ -88,6 +92,7 @@ class Artist {
     required this.followers,
     required this.following,
     required this.downloads,
+    required this.verified,
     required this.songs,
   });
 
@@ -100,6 +105,7 @@ class Artist {
       followers: int.tryParse(map['followers']?.toString() ?? '0') ?? 0,
       following: int.tryParse(map['following']?.toString() ?? '0') ?? 0,
       downloads: int.tryParse(map['downloads']?.toString() ?? '0') ?? 0,
+      verified: map['verified'] == true || map['verified'] == 'true',
       songs: (map['songs'] as List?)
           ?.cast<Map<String, dynamic>>()
           .map((songMap) => Song.fromMap(songMap))
@@ -117,12 +123,41 @@ class Artist {
       'followers': followers,
       'following': following,
       'downloads': downloads,
+      'verified': verified,
       'songs': songs.map((song) => song.toMap()).toList(),
     };
   }
+
+  Artist copyWith({
+    String? id,
+    String? name,
+    String? imageUrl,
+    String? bio,
+    int? followers,
+    int? following,
+    int? downloads,
+    bool? verified,
+    List<Song>? songs,
+  }) {
+    return Artist(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      imageUrl: imageUrl ?? this.imageUrl,
+      bio: bio ?? this.bio,
+      followers: followers ?? this.followers,
+      following: following ?? this.following,
+      downloads: downloads ?? this.downloads,
+      verified: verified ?? this.verified,
+      songs: songs ?? this.songs,
+    );
+  }
+
+  @override
+  String toString() {
+    return 'Artist(id: $id, name: $name, followers: $followers, verified: $verified)';
+  }
 }
 
-/// Album model representing a music album with its tracks
 class Album {
   final String id;
   final String title;
@@ -165,5 +200,10 @@ class Album {
       'release_date': releaseDate?.toIso8601String(),
       'description': description,
     };
+  }
+
+  @override
+  String toString() {
+    return 'Album(id: $id, title: $title, artistId: $artistId, songsCount: ${songs.length})';
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import 'auth_screen.dart';
 import 'amplify_main_screen.dart';
 import '../models.dart';
@@ -14,7 +15,6 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   final supabase = Supabase.instance.client;
 
-  // Hardcoded song list, can be replaced with Supabase data later
   final List<Song> allSongs = [
     Song(
       id: '1',
@@ -53,15 +53,18 @@ class _SplashScreenState extends State<SplashScreen> {
     if (!mounted) return;
 
     if (user == null) {
-      // Not logged in
       _navigateTo(const AuthScreen());
     } else if (user.emailConfirmedAt == null) {
-      // Logged in but email not confirmed
       _navigateTo(const AuthScreen(showResend: true));
     } else {
-      // Logged in and email confirmed
-      _navigateTo(AmplifyMainScreen(allSongs: allSongs, isArtist: true));
+      final isArtist = _checkIfArtist(user); // Can customize with your DB later
+      _navigateTo(AmplifyMainScreen(allSongs: allSongs, isArtist: isArtist));
     }
+  }
+
+  bool _checkIfArtist(User user) {
+    // Placeholder logic for artist detection
+    return user.email?.contains('kelly') ?? false;
   }
 
   void _navigateTo(Widget screen) {

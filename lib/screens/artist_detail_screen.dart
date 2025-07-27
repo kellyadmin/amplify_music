@@ -24,41 +24,46 @@ class _ArtistDetailScreenState extends State<ArtistDetailScreen> {
   }
 
   Future<Artist> _loadArtist() async {
-    // 1️⃣ Fetch artist data (use maybeSingle without execute)
     final artistResp = await _supabase
         .from('artists')
-        .select('id, name, image_url, bio, followers, following, downloads')
+        .select('id, name, image_url, bio, followers, following, downloads, verified')
         .eq('id', widget.artistId)
         .maybeSingle();
 
-    if (artistResp.errorMessage != null) {
-      throw Exception('Failed to load artist: ${artistResp.errorMessage}');
+    if (artistResp.error != null) {
+      throw Exception('Failed to load artist: ${artistResp.error!.message}');
     }
+
     final artistMap = artistResp.data as Map<String, dynamic>;
 
-    // 2️⃣ Fetch songs for this artist
     final songsResp = await _supabase
         .from('songs')
         .select('id, title, artist, audio_url, album_art_url')
         .eq('artist_id', widget.artistId)
         .order('title', ascending: true);
 
-    if (songsResp.errorMessage != null) {
-      throw Exception('Failed to load songs: ${songsResp.errorMessage}');
+    if (songsResp.error != null) {
+      throw Exception('Failed to load songs: ${songsResp.error!.message}');
     }
+
     final songsList = (songsResp.data as List)
         .map((m) => Song.fromMap(m as Map<String, dynamic>))
         .toList();
 
-    // 3️⃣ Construct Artist object
+    final isVerified = artistMap['verified'] == true ||
+        artistMap['verified']?.toString().toLowerCase() == 'true';
+
+    print("🔍 Verified status for ${artistMap['name']}: $isVerified");
+
     return Artist(
       id: artistMap['id'] as String,
       name: artistMap['name'] as String,
       imageUrl: artistMap['image_url'] as String,
       bio: artistMap['bio'] as String,
-      followers: artistMap['followers'] as int? ?? 0,
-      following: artistMap['following'] as int? ?? 0,
-      downloads: artistMap['downloads'] as int? ?? 0,
+      followers: int.tryParse('${artistMap['followers']}') ?? 0,
+      following: int.tryParse('${artistMap['following']}') ?? 0,
+      downloads: int.tryParse('${artistMap['downloads']}') ?? 0,
+      verified: isVerified,
       songs: songsList,
     );
   }
@@ -87,24 +92,37 @@ class _ArtistDetailScreenState extends State<ArtistDetailScreen> {
               ),
             );
           }
+
           final artist = snapshot.data!;
           return ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              // Profile image
               CircleAvatar(
                 radius: 70,
                 backgroundImage: NetworkImage(artist.imageUrl),
-                onBackgroundImageError: (_, __) => const Icon(Icons.person, size: 70),
+                onBackgroundImageError: (_, __) =>
+                const Icon(Icons.person, size: 70, color: Colors.white70),
               ),
               const SizedBox(height: 16),
 
-              // Name
-              Text(
-                artist.name,
-                style: const TextStyle(
-                    fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white),
-                textAlign: TextAlign.center,
+              // Name + Verified badge
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    artist.name,
+                    style: const TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  if (artist.verified)
+                    const Padding(
+                      padding: EdgeInsets.only(left: 6),
+                      child: Icon(Icons.verified, size: 22, color: Colors.blue),
+                    ),
+                ],
               ),
               const SizedBox(height: 8),
 
@@ -127,24 +145,48 @@ class _ArtistDetailScreenState extends State<ArtistDetailScreen> {
               ),
               const SizedBox(height: 24),
 
-              // Songs list
+              // Songs Section
               Text(
                 'Songs',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: gold),
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: gold,
+                ),
               ),
               const SizedBox(height: 12),
+
               ...artist.songs.map((song) {
                 return ListTile(
                   contentPadding: EdgeInsets.zero,
                   leading: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: song.albumArtUrl.isNotEmpty
-                        ? Image.network(song.albumArtUrl,
-                        width: 50, height: 50, fit: BoxFit.cover)
-                        : Container(width: 50, height: 50, color: Colors.grey),
+                        ? Image.network(
+                      song.albumArtUrl,
+                      width: 50,
+                      height: 50,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Container(
+                        width: 50,
+                        height: 50,
+                        color: Colors.grey,
+                      ),
+                    )
+                        : Container(
+                      width: 50,
+                      height: 50,
+                      color: Colors.grey,
+                    ),
                   ),
-                  title: Text(song.title, style: const TextStyle(color: Colors.white)),
-                  subtitle: Text(song.artist, style: const TextStyle(color: Colors.white70)),
+                  title: Text(
+                    song.title,
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                  subtitle: Text(
+                    song.artist,
+                    style: const TextStyle(color: Colors.white70),
+                  ),
                   trailing: Icon(Icons.play_circle_fill, color: gold, size: 30),
                   onTap: () {
                     Navigator.push(
@@ -167,13 +209,19 @@ class _ArtistDetailScreenState extends State<ArtistDetailScreen> {
     );
   }
 
-  Widget _statItem(String label, int count, Color gold) {
+  Widget _statItem(String label, int count, Color color) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         children: [
-          Text('$count',
-              style: TextStyle(color: gold, fontSize: 18, fontWeight: FontWeight.bold)),
+          Text(
+            '$count',
+            style: TextStyle(
+              color: color,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 4),
           Text(label, style: const TextStyle(color: Colors.white70)),
         ],

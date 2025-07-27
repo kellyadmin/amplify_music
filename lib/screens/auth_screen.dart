@@ -1,7 +1,5 @@
-// Updated auth_screen.dart
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'reset_password_screen.dart'; // Optional if creating a new screen
 
 class AuthScreen extends StatefulWidget {
   final bool showResend;
@@ -16,6 +14,8 @@ class _AuthScreenState extends State<AuthScreen> {
   final supabase = Supabase.instance.client;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+
   bool isLogin = true;
   bool isLoading = false;
   bool showResend = false;
@@ -27,16 +27,34 @@ class _AuthScreenState extends State<AuthScreen> {
     showResend = widget.showResend;
   }
 
-  void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+  void _showSnack(String message, {Color color = Colors.orange}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: color),
+    );
+  }
+
+  Future<void> _createUserProfile(String userId, String email, String username) async {
+    try {
+      await supabase.from('users').insert({
+        'id': userId,
+        'email': email,
+        'username': username,
+        'user_type': 'normal', // You can make this dynamic later
+        'is_verified': true,
+      });
+      print("✅ User profile created");
+    } catch (e) {
+      print("❌ Error creating profile: $e");
+    }
   }
 
   Future<void> _submit() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
+    final username = _usernameController.text.trim();
 
-    if (email.isEmpty || password.isEmpty) {
-      _showError('Please enter both email and password.');
+    if (email.isEmpty || password.isEmpty || (!isLogin && username.isEmpty)) {
+      _showSnack('Fill all required fields.', color: Colors.red);
       return;
     }
 
@@ -52,27 +70,35 @@ class _AuthScreenState extends State<AuthScreen> {
           password: password,
         );
 
-        final confirmedAt = response.user?.emailConfirmedAt;
-        final isConfirmed = confirmedAt != null;
+        final user = response.user;
+        final isConfirmed = user?.emailConfirmedAt != null;
 
         if (!isConfirmed) {
-          _showError("Please verify your email first.");
+          _showSnack("Please verify your email first.", color: Colors.red);
           setState(() => showResend = true);
         } else {
-          _showError("Login successful!");
+          _showSnack("Login successful!");
+          Navigator.pop(context, true);
         }
       } else {
-        await supabase.auth.signUp(
+        final response = await supabase.auth.signUp(
           email: email,
           password: password,
           emailRedirectTo: 'https://conhbihmsgdujpwhperh.supabase.co/auth/callback',
         );
-        _showError("Account created! Check your email for verification.");
+
+        final userId = response.user?.id;
+        if (userId != null) {
+          await _createUserProfile(userId, email, username);
+        }
+
+        _showSnack("Account created! Check your email for verification.");
+        setState(() => isLogin = true);
       }
     } on AuthException catch (e) {
-      _showError(e.message);
+      _showSnack(e.message, color: Colors.red);
     } catch (e) {
-      _showError("Unexpected error: ${e.toString()}");
+      _showSnack("Unexpected error: ${e.toString()}", color: Colors.red);
     } finally {
       setState(() => isLoading = false);
     }
@@ -83,7 +109,7 @@ class _AuthScreenState extends State<AuthScreen> {
     final password = _passwordController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
-      _showError('Enter your email and password to resend verification.');
+      _showSnack('Enter your email and password to resend verification.', color: Colors.red);
       return;
     }
 
@@ -93,9 +119,9 @@ class _AuthScreenState extends State<AuthScreen> {
         password: password,
         emailRedirectTo: 'https://conhbihmsgdujpwhperh.supabase.co/auth/callback',
       );
-      _showError("Verification email resent!");
+      _showSnack("Verification email resent!");
     } catch (e) {
-      _showError("Error resending email: ${e.toString()}");
+      _showSnack("Error resending email: ${e.toString()}", color: Colors.red);
     }
   }
 
@@ -103,7 +129,7 @@ class _AuthScreenState extends State<AuthScreen> {
     final email = _emailController.text.trim();
 
     if (email.isEmpty) {
-      _showError('Enter your email to receive reset link.');
+      _showSnack('Enter your email to receive reset link.', color: Colors.red);
       return;
     }
 
@@ -112,9 +138,9 @@ class _AuthScreenState extends State<AuthScreen> {
         email,
         redirectTo: 'io.supabase.amplify://reset-password',
       );
-      _showError("Password reset email sent!");
+      _showSnack("Password reset email sent!");
     } catch (e) {
-      _showError("Error sending reset email: ${e.toString()}");
+      _showSnack("Error sending reset email: ${e.toString()}", color: Colors.red);
     }
   }
 
@@ -131,6 +157,16 @@ class _AuthScreenState extends State<AuthScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            if (!isLogin)
+              TextField(
+                controller: _usernameController,
+                style: const TextStyle(color: Colors.white),
+                decoration: const InputDecoration(
+                  labelText: 'Username',
+                  labelStyle: TextStyle(color: Colors.white70),
+                ),
+              ),
+            const SizedBox(height: 10),
             TextField(
               controller: _emailController,
               style: const TextStyle(color: Colors.white),

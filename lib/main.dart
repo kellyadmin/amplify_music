@@ -1,5 +1,3 @@
-import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uni_links/uni_links.dart';
@@ -17,11 +15,10 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // ✅ This is the correct way now (with authFlowType required)
   await Supabase.initialize(
     url: 'https://conhbihmsgdujpwhperh.supabase.co',
     anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNvbmhiaWhtc2dkdWpwd2hwZXJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI4MTY3NjMsImV4cCI6MjA2ODM5Mjc2M30.wic-hToCZl9CNXvqyXcxAyjY7YtKVfp70fe0As77XnQ',
-    authFlowType: AuthFlowType.pkce, // ✅ required for web auth sessions
+    authFlowType: AuthFlowType.pkce,
   );
 
   runApp(const MyApp());
@@ -29,55 +26,26 @@ void main() async {
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
-
   @override
   State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
-  StreamSubscription? _sub;
-
   @override
   void initState() {
     super.initState();
-    _handleDeepLinks();
+    handleInitialDeepLinks();
   }
 
-  void _handleDeepLinks() {
-    if (kIsWeb) {
-      _processDeepLink(Uri.base);
-    } else {
-      getInitialUri().then((uri) {
-        if (uri != null) _processDeepLink(uri);
-      });
-      _sub = uriLinkStream.listen((uri) {
-        if (uri != null) _processDeepLink(uri);
-      });
+  void handleInitialDeepLinks() async {
+    final uri = await getInitialUri();
+    if (uri != null && uri.queryParameters['access_token'] != null) {
+      navigatorKey.currentState?.push(
+        MaterialPageRoute(
+          builder: (_) => ResetPasswordScreen(token: uri.queryParameters['access_token']!),
+        ),
+      );
     }
-  }
-
-  void _processDeepLink(Uri uri) {
-    final token = uri.queryParameters['access_token'];
-
-    final isMobileReset =
-        uri.scheme == 'io.supabase.amplify' && uri.host == 'reset-password';
-    final isWebReset = kIsWeb && uri.queryParameters['type'] == 'recovery';
-
-    if ((isMobileReset || isWebReset) && token != null && token.isNotEmpty) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        navigatorKey.currentState?.pushReplacement(
-          MaterialPageRoute(
-            builder: (_) => ResetPasswordScreen(token: token),
-          ),
-        );
-      });
-    }
-  }
-
-  @override
-  void dispose() {
-    _sub?.cancel();
-    super.dispose();
   }
 
   @override
@@ -88,12 +56,9 @@ class _MyAppState extends State<MyApp> {
       title: 'Amplify Music',
       theme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: Colors.black,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.yellow,
-          brightness: Brightness.dark,
-        ),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.yellow, brightness: Brightness.dark),
       ),
-      home: const AmplifyMainScreen(),
+      home: const AmplifyMainScreen(), // ✅ load directly here
       routes: {
         '/song': (ctx) {
           final id = ModalRoute.of(ctx)!.settings.arguments as String;

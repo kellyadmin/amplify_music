@@ -1,13 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.amplify_music"> <!-- Replace with your real package -->
+    package="com.example.amplify_music">
 
-    <!-- ✅ Permissions to access audio and external storage -->
-    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <!-- 📂 Permissions to access files and audio on various Android versions -->
+    <!-- Android ≤12: legacy external storage -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <!-- Android 13+: scoped media permission -->
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"/>
+    <!-- Android 11+: broad MANAGE_EXTERNAL_STORAGE (All files access) -->
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
 
     <application
         android:label="amplify_music"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:requestLegacyExternalStorage="true">
 
         <activity
             android:name=".MainActivity"
@@ -47,6 +53,7 @@
             android:value="2" />
     </application>
 
+    <!-- If your code needs to query for external apps or files via intents -->
     <queries>
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT" />

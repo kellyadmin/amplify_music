@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:dio/dio.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:io';
+
 import '../models.dart';
-import 'auth_screen.dart'; // ✅ Needed for login redirect
+import 'auth_screen.dart';
 
 class AudioPlayerScreen extends StatefulWidget {
   final Song song;
@@ -15,23 +20,26 @@ class AudioPlayerScreen extends StatefulWidget {
 
 class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
   late AudioPlayer _player;
-  bool _isPlaying = false;
   final supabase = Supabase.instance.client;
+
+  bool _isPlaying = false;
+  bool _isLiked = false;
+  bool _isDownloading = false;
+  double _downloadProgress = 0.0;
 
   @override
   void initState() {
     super.initState();
     _player = AudioPlayer();
     _initializePlayer();
+    _loadLikeStatus();
   }
 
   Future<void> _initializePlayer() async {
     try {
       await _player.setUrl(widget.song.url);
       await _player.play();
-      setState(() {
-        _isPlaying = true;
-      });
+      setState(() => _isPlaying = true);
     } catch (e) {
       debugPrint('Failed to play audio: $e');
     }
@@ -43,24 +51,100 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
     } else {
       _player.play();
     }
-    setState(() {
-      _isPlaying = _player.playing;
-    });
+    setState(() => _isPlaying = _player.playing);
   }
 
   void _handleProtectedAction(Function onConfirmed) {
     final user = supabase.auth.currentUser;
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please log in to use this feature.")),
+        const SnackBar(
+          content: Text("Please log in to use this feature."),
+          backgroundColor: Colors.redAccent,
+        ),
       );
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => const AuthScreen()),
-      );
+      Navigator.push(context, MaterialPageRoute(builder: (_) => const AuthScreen()));
     } else {
       onConfirmed();
     }
+  }
+
+  Future<void> _loadLikeStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    final liked = prefs.getBool('like_${widget.song.id}') ?? false;
+    setState(() => _isLiked = liked);
+  }
+
+  Future<void> _likeSong() async {
+    final user = supabase.auth.currentUser;
+    if (user == null) return;
+
+    final prefs = await SharedPreferences.getInstance();
+    setState(() => _isLiked = !_isLiked);
+    await prefs.setBool('like_${widget.song.id}', _isLiked);
+
+    if (_isLiked) {
+      await supabase.from('song_likes').insert({
+        'user_id': user.id,
+        'song_id': widget.song.id,
+      });
+    } else {
+      await supabase
+          .from('song_likes')
+          .delete()
+          .match({'user_id': user.id, 'song_id': widget.song.id});
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(_isLiked ? "Liked ❤️" : "Unliked")),
+    );
+  }
+
+  String sanitizeFileName(String input) {
+    return input.replaceAll(RegExp(r'[^\w\s-]'), '').replaceAll(' ', '_');
+  }
+
+  Future<void> _downloadSong() async {
+    final tempDir = await getExternalStorageDirectory();
+    if (tempDir == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Cannot access storage")),
+      );
+      return;
+    }
+    final filePath = '${tempDir.path}/${sanitizeFileName(widget.song.title)}.mp3';
+
+    final dio = Dio();
+
+    setState(() {
+      _isDownloading = true;
+      _downloadProgress = 0.0;
+    });
+
+    try {
+      await dio.download(
+        widget.song.url,
+        filePath,
+        onReceiveProgress: (received, total) {
+          if (total != -1) {
+            setState(() {
+              _downloadProgress = received / total;
+            });
+          }
+        },
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("✅ Download complete")),
+      );
+    } catch (e) {
+      debugPrint("Download error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("❌ Download failed")),
+      );
+    }
+
+    setState(() => _isDownloading = false);
   }
 
   @override
@@ -74,38 +158,39 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: Text(widget.song.title),
         backgroundColor: Colors.black,
+        title: Text(widget.song.title),
         actions: [
           IconButton(
-            icon: const Icon(Icons.favorite_border),
-            onPressed: () {
-              _handleProtectedAction(() {
-                // TODO: Implement like logic
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Liked!")),
-                );
-              });
-            },
+            icon: Icon(
+              _isLiked ? Icons.favorite : Icons.favorite_border,
+              color: _isLiked ? Colors.redAccent : Colors.white,
+            ),
+            onPressed: () => _handleProtectedAction(_likeSong),
           ),
-          IconButton(
+          _isDownloading
+              ? Padding(
+            padding: const EdgeInsets.all(14.0),
+            child: SizedBox(
+              height: 20,
+              width: 20,
+              child: CircularProgressIndicator(
+                color: Colors.white,
+                strokeWidth: 2.5,
+                value: _downloadProgress,
+              ),
+            ),
+          )
+              : IconButton(
             icon: const Icon(Icons.download_rounded),
-            onPressed: () {
-              _handleProtectedAction(() {
-                // TODO: Implement download logic
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Download started")),
-                );
-              });
-            },
+            onPressed: () => _handleProtectedAction(_downloadSong),
           ),
         ],
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          if (widget.song.albumArtUrl != null &&
-              widget.song.albumArtUrl!.isNotEmpty)
+          if (widget.song.albumArtUrl != null && widget.song.albumArtUrl!.isNotEmpty)
             Padding(
               padding: const EdgeInsets.all(20),
               child: ClipRRect(

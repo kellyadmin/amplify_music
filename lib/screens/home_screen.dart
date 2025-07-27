@@ -25,20 +25,24 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentBanner = 0;
   Timer? _autoSlideTimer;
 
+  final List<String> menuLabels = ['For You', 'Hot Songs', 'New', 'Top 20'];
+  int selectedMenu = 0;
+
   @override
   void initState() {
     super.initState();
     _loadHomeData();
 
     _autoSlideTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
+      if (!mounted) return;
       if (_pageController.hasClients && banners.isNotEmpty) {
-        int nextPage = _currentBanner + 1;
-        if (nextPage >= banners.length) nextPage = 0;
+        final nextPage = (_currentBanner + 1) % banners.length;
         _pageController.animateToPage(
           nextPage,
           duration: const Duration(milliseconds: 350),
           curve: Curves.easeInOut,
         );
+        if (mounted) setState(() => _currentBanner = nextPage);
       }
     });
   }
@@ -59,10 +63,6 @@ class _HomeScreenState extends State<HomeScreen> {
           .order('inserted_at', ascending: false)
           .execute();
 
-      banners = (bannerResp.data as List)
-          .map((m) => BannerItem.fromMap(m as Map<String, dynamic>))
-          .toList();
-
       final trendResp = await supabase
           .from('songs')
           .select()
@@ -71,96 +71,108 @@ class _HomeScreenState extends State<HomeScreen> {
           .limit(10)
           .execute();
 
-      trendingSongs = (trendResp.data as List)
-          .map((m) => Song.fromMap(m as Map<String, dynamic>))
-          .toList();
-
       final artResp = await supabase
           .from('artists')
-          .select()
+          .select('id, name, image_url, bio, verified, featured, followers, following, downloads')
           .eq('featured', true)
           .limit(10)
           .execute();
+
+      banners = (bannerResp.data as List)
+          .map((m) => BannerItem.fromMap(m as Map<String, dynamic>))
+          .toList();
+
+      trendingSongs = (trendResp.data as List)
+          .map((m) => Song.fromMap(m as Map<String, dynamic>))
+          .toList();
 
       featuredArtists = (artResp.data as List)
           .map((m) => Artist.fromMap(m as Map<String, dynamic>))
           .toList();
     } catch (e) {
-      print('Home loading error: $e');
+      print('Error loading home data: $e');
     }
 
-    setState(() => isLoading = false);
+    if (mounted) setState(() => isLoading = false);
   }
 
-  Widget buildIconLabel(IconData icon, int count, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Row(
-        children: [
-          Icon(icon, size: 14, color: Colors.white70),
-          const SizedBox(width: 4),
-          Text('$count',
-              style: const TextStyle(color: Colors.white70, fontSize: 12)),
-        ],
-      ),
+  String formatNumber(int number) {
+    if (number >= 1000000000) return '${(number / 1000000000).toStringAsFixed(1)}B';
+    if (number >= 1000000) return '${(number / 1000000).toStringAsFixed(1)}M';
+    if (number >= 1000) return '${(number / 1000).toStringAsFixed(1)}k';
+    return number.toString();
+  }
+
+  String formatBoostedNumber(int number, {double boostFactor = 3}) {
+    return formatNumber((number * boostFactor).toInt());
+  }
+
+  Widget buildFancyIconLabel(IconData icon, int count, Color color) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.2),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, size: 14, color: color),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          formatNumber(count),
+          style: TextStyle(color: color, fontSize: 13, fontWeight: FontWeight.bold),
+        ),
+      ],
     );
   }
 
-  Widget buildSectionTitle(String title, VoidCallback onViewAll) {
+  Widget buildSectionTitle(String title) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(title,
-              style: const TextStyle(
-                  fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
-          TextButton(
-            onPressed: onViewAll,
-            child: const Text("View All",
-                style: TextStyle(color: Colors.white70)),
-          ),
-        ],
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Text(
+        title,
+        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
       ),
     );
   }
 
   Widget buildTopMenu() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
-        children: [
-          _menuButton("For You", true),
-          _menuButton("Hot Songs", false),
-          _menuButton("New", false),
-          _menuButton("Top 20", false),
-        ],
+        children: List.generate(menuLabels.length, (index) {
+          final isSelected = index == selectedMenu;
+          return GestureDetector(
+            onTap: () => setState(() => selectedMenu = index),
+            child: Container(
+              margin: const EdgeInsets.only(right: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+              decoration: BoxDecoration(
+                color: isSelected ? Colors.amber : Colors.grey[900],
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                menuLabels[index],
+                style: TextStyle(
+                  color: isSelected ? Colors.black : Colors.white70,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          );
+        }),
       ),
-    );
-  }
-
-  Widget _menuButton(String label, bool isSelected) {
-    return Container(
-      margin: const EdgeInsets.only(right: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: isSelected ? const Color(0xFFFFD700) : Colors.grey[850],
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(label,
-          style: TextStyle(
-            color: isSelected ? Colors.black : Colors.white70,
-            fontWeight: FontWeight.w500,
-          )),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final gold = const Color(0xFFFFD700);
-    final userEmail = Supabase.instance.client.auth.currentUser?.email ?? "Hi 👋";
+    final userEmail = supabase.auth.currentUser?.email ?? "👋";
 
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
         title: Text("Hi, $userEmail", style: const TextStyle(fontSize: 16)),
@@ -168,15 +180,12 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () async {
-              await Supabase.instance.client.auth.signOut();
-              if (mounted) {
-                Navigator.pushReplacementNamed(context, '/login');
-              }
+              await supabase.auth.signOut();
+              if (mounted) Navigator.pushReplacementNamed(context, '/login');
             },
           )
         ],
       ),
-      backgroundColor: Colors.black,
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
@@ -188,66 +197,52 @@ class _HomeScreenState extends State<HomeScreen> {
             buildTopMenu(),
             const SizedBox(height: 20),
 
-            // 🎞 Banner
-            if (banners.isNotEmpty) ...[
-              SizedBox(
-                height: 190,
-                child: PageView.builder(
-                  controller: _pageController,
-                  itemCount: banners.length,
-                  onPageChanged: (index) {
-                    setState(() => _currentBanner = index);
-                  },
-                  itemBuilder: (context, i) {
-                    final b = banners[i];
-                    return Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 8),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(14),
-                        image: DecorationImage(
-                          image: NetworkImage(b.imageUrl),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(14),
-                          gradient: LinearGradient(
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter,
-                            colors: [
-                              Colors.black.withOpacity(0.6),
-                              Colors.transparent,
-                            ],
+            // 🔥 BANNERS
+            if (banners.isNotEmpty)
+              Column(
+                children: [
+                  SizedBox(
+                    height: 190,
+                    child: PageView.builder(
+                      controller: _pageController,
+                      itemCount: banners.length,
+                      onPageChanged: (i) => setState(() => _currentBanner = i),
+                      itemBuilder: (context, i) {
+                        final b = banners[i];
+                        return Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 8),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(14),
+                            image: DecorationImage(
+                              image: NetworkImage(b.imageUrl),
+                              fit: BoxFit.cover,
+                            ),
                           ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(height: 8),
-              Center(
-                child: SmoothPageIndicator(
-                  controller: _pageController,
-                  count: banners.length,
-                  effect: ExpandingDotsEffect(
-                    activeDotColor: gold,
-                    dotColor: Colors.grey,
-                    dotHeight: 8,
-                    dotWidth: 8,
-                    expansionFactor: 3,
-                    spacing: 6,
+                        );
+                      },
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 8),
+                  SmoothPageIndicator(
+                    controller: _pageController,
+                    count: banners.length,
+                    effect: const ExpandingDotsEffect(
+                      activeDotColor: Colors.amber,
+                      dotColor: Colors.grey,
+                      dotHeight: 8,
+                      dotWidth: 8,
+                      expansionFactor: 3,
+                      spacing: 6,
+                    ),
+                  ),
+                ],
               ),
-            ],
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 30),
 
-            // 🔥 Trending Songs
-            buildSectionTitle("Trending Songs", () {}),
-            const SizedBox(height: 10),
+            // 🔥 TRENDING SONGS
+            buildSectionTitle("Trending Songs"),
+            const SizedBox(height: 12),
             SizedBox(
               height: 200,
               child: ListView.builder(
@@ -291,13 +286,12 @@ class _HomeScreenState extends State<HomeScreen> {
                             style: const TextStyle(color: Colors.white),
                           ),
                           const SizedBox(height: 4),
-                          Row(
+                          Wrap(
+                            spacing: 6,
                             children: [
-                              buildIconLabel(Icons.thumb_up_alt_outlined,
-                                  s.likes ?? 0, () {}),
-                              const SizedBox(width: 12),
-                              buildIconLabel(Icons.download_outlined,
-                                  s.downloads ?? 0, () {}),
+                              buildFancyIconLabel(Icons.play_arrow, s.playCount, Colors.amber),
+                              buildFancyIconLabel(Icons.thumb_up, s.likes, Colors.redAccent),
+                              buildFancyIconLabel(Icons.download, s.downloads, Colors.lightBlueAccent),
                             ],
                           ),
                         ],
@@ -308,11 +302,11 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 30),
 
-            // 👤 Featured Artists
-            buildSectionTitle("Featured Artists", () {}),
-            const SizedBox(height: 10),
+            // 🌟 FEATURED ARTISTS
+            buildSectionTitle("Featured Artists"),
+            const SizedBox(height: 12),
             SizedBox(
               height: 130,
               child: ListView.builder(
@@ -331,23 +325,33 @@ class _HomeScreenState extends State<HomeScreen> {
                             width: 80,
                             height: 80,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => Container(
-                              color: Colors.grey,
-                              width: 80,
-                              height: 80,
-                            ),
+                            errorBuilder: (_, __, ___) =>
+                                Container(color: Colors.grey, width: 80, height: 80),
                           ),
                         ),
                         const SizedBox(height: 6),
                         SizedBox(
                           width: 80,
-                          child: Text(
-                            a.name,
-                            style: const TextStyle(color: Colors.white),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            textAlign: TextAlign.center,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  a.name,
+                                  style: const TextStyle(color: Colors.white),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                              if (a.verified)
+                                const Icon(Icons.verified, size: 14, color: Colors.amber),
+                            ],
                           ),
+                        ),
+                        Text(
+                          '${formatBoostedNumber(a.followers)} followers',
+                          style: const TextStyle(color: Colors.white70, fontSize: 12),
                         ),
                       ],
                     ),
