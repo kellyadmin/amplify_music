@@ -1,16 +1,29 @@
-# amplify_music
+# Amplify Music
 
-A new Flutter project.
+Amplify Music is a professional music streaming app inspired by Boomplay, built with Flutter.
+
+## Features
+
+- Stream and download music worldwide
+- Artist profiles with verified badges
+- Premium user subscriptions and payments
+- Upload and edit user avatars and usernames
+- Responsive Flutter Web & Mobile support
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+To get a local copy up and running follow these simple steps:
 
-A few resources to get you started if this is your first Flutter project:
+### Prerequisites
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- Flutter SDK (version 3.22.0)
+- Firebase project setup
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### Installation
+
+1. Clone the repo
+
+```bash
+git clone https://github.com/kellyadmin/amplify_music.git
+cd amplify_music
+flutter pub get
