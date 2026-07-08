@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "ultra-mcp": {
+      "command": "node",
+      "args": ["C:\\Users\\DR KELLY\\AppData\\Roaming\\npm\\node_modules\\ultra-mcp\\dist\\cli.js"],
+      "env": {
+        "GOOGLE_API_KEY": "AIzaSyB4wxEnoypIiHGVI2Hm140vZSGwQV_373o",
+        "OPENAI_API_KEY": "238f136c40a14534b02035286cb7d68b.dcYnu1kwfClvH5w5"
+      }
+    }
+  }
+}

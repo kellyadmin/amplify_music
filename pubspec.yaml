@@ -1,0 +1,137 @@
+name: amplify_music
+description: A Flutter Boomplay-style music app.
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.1.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # For clean URLs on web (removes # from links)
+  flutter_web_plugins:
+    sdk: flutter
+  # UI & Fonts
+  cupertino_icons: ^1.0.8
+  google_fonts: ^6.1.0
+  smooth_page_indicator: ^1.0.0
+  flutter_svg: ^2.0.7
+  lottie: ^3.0.0
+  animations: ^2.0.11
+  shimmer: ^3.0.0
+  # Charts and Graphs
+  fl_chart: ^0.68.0
+  # ADDED: For number formatting (NumberFormat)
+  intl: ^0.19.0
+  # Cached network image for efficient image loading and caching
+  cached_network_image: ^3.2.3
+  # Audio Playback
+  just_audio: ^0.9.36
+  audio_session: ^0.1.16
+  audio_service: ^0.18.0
+  # State Management & Storage
+  provider: ^6.0.5
+  shared_preferences: ^2.1.1
+  # File Handling
+  image_picker: ^1.0.4
+  file_picker: ^8.0.0
+  path_provider: ^2.1.2
+  dio: ^5.4.1
+  # Supabase & Auth
+  supabase_flutter: ^1.10.25
+  supabase: ^1.11.11
+  postgrest: ^1.5.2
+  realtime_client: ^1.4.0
+  gotrue: ^1.12.6
+  storage_client: ^1.5.4
+  functions_client: ^1.3.2
+  # LOCATION SERVICES: Added to get user's location and country code
+  geolocator: ^12.0.0
+  geocoding: ^4.0.0
+  # Video playback and thumbnail generation
+  video_player: ^2.8.6
+  chewie: ^1.7.5
+  # Video thumbnail generation for mobile
+  video_thumbnail: ^0.5.3
+  # Firebase Core and Firestore
+  firebase_core: ^2.25.4
+  cloud_firestore: ^4.13.0
+  # Deep Linking
+  # uni_links: ^0.5.1  # DEPRECATED - replaced with app_links
+  app_links: ^3.5.1
+  # URL Launcher for opening URLs
+  url_launcher: ^6.3.0
+  # Local Songs (Android) - REMOVED due to build configuration issues with on_audio_query
+  # TODO: Re-enable after resolving plugin build.gradle issues
+  permission_handler: ^12.0.1
+  # Web download support
+  universal_html: ^2.2.4
+  # HTTP client for web requests - ADDED FOR WEB GEOCODING
+  http: ^1.1.0
+  # Splash screen support
+  flutter_native_splash: ^2.4.6
+  # For dynamic color theming
+  palette_generator: ^0.3.3+3
+  # WebSocket support
+  web_socket_channel: ^2.4.0
+  # ADDED: For offline functionality
+  connectivity_plus: ^5.0.2
+  internet_connection_checker: ^1.0.0+1 # CORRECTED VERSION
+  google_mobile_ads: ^6.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.13.1
+
+dependency_overrides:
+  html: "^0.15.5+1"
+  # Force v6+ for the transitive sign_in_with_apple dependency pulled in
+  # by supabase_flutter 1.x. Without this, pub resolves it to 5.0.0
+  # and the Android build fails with "Unresolved reference 'Registrar'".
+  sign_in_with_apple: ^6.1.4
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/ # This includes your app_icon.png and google_icon.png
+    - assets/icon/
+    - assets/audio/
+    - assets/animations/your_splash_loader.json
+    - assets/animations/loading_animation6.json
+    - assets/animations/loader_animation.json
+    # The line 'assets/images/google_icon.png' was removed
+    # because the entire 'assets/images/' folder is already included above.
+
+flutter_native_splash:
+  color: "#0A0A0B" # Viba near-black brand background for the native splash
+  image: assets/icon/icon_foreground.png # Glyph-only asset for the native splash screen
+  android: true
+  ios: true
+  web: false
+  android_12:
+    color: "#0A0A0B"
+    image: assets/icon/icon_foreground.png
+    icon_background_color: "#0A0A0B"
+
+flutter_icons:
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  image_path: "assets/icon/icon.png" # Full-bleed black & gold icon
+  adaptive_icon_background: "assets/icon/icon_background.png"
+  adaptive_icon_foreground: "assets/icon/icon_foreground.png"
+  adaptive_icon_monochrome: "assets/icon/icon_monochrome.png"
+  min_sdk_android: 21
+  web:
+    generate: true
+    image_path: "assets/icon/icon.png"
+    background_color: "#0A0A0B"
+    theme_color: "#0A0A0B"
+  windows:
+    generate: true
+    image_path: "assets/icon/icon.png"
+    icon_size: 256

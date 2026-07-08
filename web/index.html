@@ -1,0 +1,578 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <base href="$FLUTTER_BASE_HREF" />
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, maximum-scale=5.0"
+        />
+        <meta name="theme-color" content="#0A0818" />
+
+        <!-- SEO Meta Tags -->
+        <title>Viba Music – Stream & Download Afrobeat Hits</title>
+        <meta
+            name="description"
+            content="Viba Music: Premium Afrobeat, Amapiano & Afropop streaming platform. Discover, stream and download the hottest African music hits."
+        />
+        <link
+            rel="canonical"
+            href="https://vibamusic.site/"
+            id="canonical-url"
+        />
+        <meta name="robots" content="index, follow" />
+
+        <!-- Open Graph -->
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://vibamusic.site/" id="og-url" />
+        <meta
+            property="og:title"
+            content="Viba Music – Stream Afrobeat Hits"
+            id="og-title"
+        />
+        <meta
+            property="og:description"
+            content="Premium African music streaming platform. Discover the best Afrobeat, Amapiano & Afropop hits."
+            id="og-description"
+        />
+        <meta
+            property="og:image"
+            content="https://vibamusic.site/icons/social-preview.png"
+            id="og-image"
+        />
+
+        <!-- Twitter Card -->
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta
+            name="twitter:url"
+            content="https://vibamusic.site/"
+            id="twitter-url"
+        />
+        <meta
+            name="twitter:title"
+            content="Viba Music – Afrobeat Streaming"
+            id="twitter-title"
+        />
+        <meta
+            name="twitter:description"
+            content="Discover and stream the hottest African music hits."
+            id="twitter-description"
+        />
+        <meta
+            name="twitter:image"
+            content="https://vibamusic.site/icons/social-preview.png"
+            id="twitter-image"
+        />
+
+        <!-- Icons -->
+        <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" href="favicon.png" />
+        <link rel="manifest" href="manifest.json" />
+
+        <!-- Preconnect for faster loading -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+        <!-- Professional Fonts -->
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap"
+            rel="stylesheet"
+        />
+
+        <!-- Inline Critical CSS for instant loading -->
+        <style>
+            /* Reset and base styles */
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            html {
+                font-family: "Inter", sans-serif;
+                line-height: 1.6;
+                -webkit-text-size-adjust: 100%;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+
+            body {
+                margin: 0;
+                padding: 0;
+                background: #0a0818;
+                color: #fff;
+                overflow: hidden;
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            /* Professional Splash Screen */
+            .splash-container {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(135deg, #0a0818 0%, #1c1733 100%);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+                transition: opacity 0.2s ease-out;
+            }
+
+            .splash-content {
+                text-align: center;
+                animation: fadeInUp 0.3s ease-out;
+            }
+
+            .logo-container {
+                margin-bottom: 2rem;
+                position: relative;
+            }
+
+            .logo-circle {
+                width: 120px;
+                height: 120px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, #5b3df5, #2f8fff);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto;
+                box-shadow: 0 10px 30px rgba(91, 61, 245, 0.4);
+                animation: pulse 2s infinite;
+            }
+
+            .logo-text {
+                font-family: "Playfair Display", serif;
+                font-size: 3rem;
+                font-weight: 900;
+                color: #5b3df5;
+                letter-spacing: 1px;
+                text-shadow: 0 2px 10px rgba(91, 61, 245, 0.4);
+            }
+
+            .brand-name {
+                font-family: "Playfair Display", serif;
+                font-size: 2.5rem;
+                font-weight: 900;
+                color: #5b3df5;
+                margin-bottom: 0.5rem;
+                letter-spacing: 2px;
+            }
+
+            .tagline {
+                font-size: 0.9rem;
+                color: rgba(255, 255, 255, 0.7);
+                letter-spacing: 3px;
+                text-transform: uppercase;
+                margin-bottom: 2rem;
+            }
+
+            .loading-bar {
+                width: 200px;
+                height: 3px;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 3px;
+                overflow: hidden;
+                margin: 0 auto;
+            }
+
+            .loading-progress {
+                height: 100%;
+                width: 0;
+                background: linear-gradient(90deg, #5b3df5, #2f8fff);
+                border-radius: 3px;
+                animation: loading 2s infinite;
+            }
+
+            .status-message {
+                margin-top: 1.5rem;
+                font-size: 0.9rem;
+                color: rgba(255, 255, 255, 0.6);
+                height: 20px;
+            }
+
+            /* Animations */
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes pulse {
+                0% {
+                    transform: scale(1);
+                }
+                50% {
+                    transform: scale(1.05);
+                }
+                100% {
+                    transform: scale(1);
+                }
+            }
+
+            @keyframes loading {
+                0% {
+                    width: 0%;
+                }
+                50% {
+                    width: 70%;
+                }
+                100% {
+                    width: 100%;
+                }
+            }
+
+            /* Professional footer */
+            .splash-footer {
+                position: absolute;
+                bottom: 30px;
+                left: 0;
+                width: 100%;
+                text-align: center;
+                font-size: 0.8rem;
+                color: rgba(255, 255, 255, 0.4);
+            }
+        </style>
+
+        <!-- Defer non-critical CSS -->
+        <link
+            rel="preload"
+            href="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"
+            as="script"
+        />
+
+        <!-- Dynamic SEO Handler for Flutter Routes -->
+        <script>
+            // Store the current route to prevent duplicate updates
+            let currentRoute = "";
+
+            // Function to update SEO tags based on route
+            function updateSEOForRoute(path) {
+                // Skip if route hasn't changed
+                if (path === currentRoute) return;
+                currentRoute = path;
+
+                // Get base URL
+                const baseUrl = "https://amplifymusic.site";
+
+                // Clean up the path
+                let cleanPath = path.replace("#/", "").replace(/\/$/, "");
+
+                // Default values for home page
+                let canonicalUrl = baseUrl;
+                let title = "Amplify Music – Stream & Download Afrobeat Hits";
+                let description =
+                    "Amplify Music: Premium Afrobeat, Amapiano & Afropop streaming platform. Discover, stream and download the hottest African music hits.";
+                let imageUrl =
+                    "https://amplifymusic.site/icons/social-preview.png";
+
+                // Handle different route patterns
+                if (cleanPath.startsWith("songs/")) {
+                    const songSlug = cleanPath.substring(7); // Remove 'songs/' prefix
+                    const songName = formatSlug(songSlug);
+                    canonicalUrl = `${baseUrl}/songs/${songSlug}`;
+                    title = `${songName} – Amplify Music`;
+                    description = `Listen to ${songName} on Amplify Music. Stream and download the hottest Afrobeat hits.`;
+                    imageUrl = `https://amplifymusic.site/api/og/song/${songSlug}`;
+                } else if (cleanPath.startsWith("artist/")) {
+                    const artistSlug = cleanPath.substring(7); // Remove 'artist/' prefix
+                    const artistName = formatSlug(artistSlug);
+                    canonicalUrl = `${baseUrl}/artist/${artistSlug}`;
+                    title = `${artistName} – Amplify Music`;
+                    description = `Discover all songs by ${artistName} on Amplify Music. The best African music streaming platform.`;
+                    imageUrl = `https://amplifymusic.site/api/og/artist/${artistSlug}`;
+                } else if (cleanPath.startsWith("videos/")) {
+                    const videoSlug = cleanPath.substring(7); // Remove 'videos/' prefix
+                    const videoName = formatSlug(videoSlug);
+                    canonicalUrl = `${baseUrl}/videos/${videoSlug}`;
+                    title = `${videoName} – Amplify Music`;
+                    description = `Stream ${videoName} music video and more African content on Amplify Music.`;
+                    imageUrl = `https://amplifymusic.site/api/og/video/${videoSlug}`;
+                } else if (cleanPath === "discover") {
+                    canonicalUrl = `${baseUrl}/discover`;
+                    title = "Discover New Afrobeat Music - Amplify Music";
+                    description =
+                        "Explore and discover new Afrobeat, Amapiano & Afropop hits on Amplify Music. Your gateway to African music.";
+                } else if (cleanPath === "library") {
+                    canonicalUrl = `${baseUrl}/library`;
+                    title = "Your Music Library - Amplify Music";
+                    description =
+                        "Access your personal music library on Amplify Music. All your favorite Afrobeat songs in one place.";
+                } else if (cleanPath === "profile") {
+                    canonicalUrl = `${baseUrl}/profile`;
+                    title = "Your Profile - Amplify Music";
+                    description =
+                        "Manage your Amplify Music profile, playlists, and preferences. Personalize your African music experience.";
+                }
+
+                // Update canonical URL
+                document
+                    .getElementById("canonical-url")
+                    .setAttribute("href", canonicalUrl);
+
+                // Update page title
+                document.title = title;
+
+                // Update meta description
+                document
+                    .querySelector('meta[name="description"]')
+                    .setAttribute("content", description);
+
+                // Update Open Graph tags
+                document
+                    .getElementById("og-url")
+                    .setAttribute("content", canonicalUrl);
+                document
+                    .getElementById("og-title")
+                    .setAttribute("content", title);
+                document
+                    .getElementById("og-description")
+                    .setAttribute("content", description);
+                document
+                    .getElementById("og-image")
+                    .setAttribute("content", imageUrl);
+
+                // Update Twitter Card tags
+                document
+                    .getElementById("twitter-url")
+                    .setAttribute("content", canonicalUrl);
+                document
+                    .getElementById("twitter-title")
+                    .setAttribute("content", title);
+                document
+                    .getElementById("twitter-description")
+                    .setAttribute("content", description);
+                document
+                    .getElementById("twitter-image")
+                    .setAttribute("content", imageUrl);
+
+                // Update URL in browser without reload
+                if (window.history.pushState) {
+                    window.history.pushState(
+                        { path: cleanPath },
+                        "",
+                        cleanPath === "" ? "/" : `/${cleanPath}`,
+                    );
+                }
+
+                // Log for debugging
+                console.log("SEO Updated:", {
+                    path: cleanPath,
+                    canonicalUrl,
+                    title,
+                    description,
+                });
+            }
+
+            // Helper function to format slugs into readable titles
+            function formatSlug(slug) {
+                return slug
+                    .split("-")
+                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(" ");
+            }
+
+            // Enhanced automatic route detection for Flutter
+            function setupAutomaticRouteDetection() {
+                // 1. Handle initial route when page loads
+                const initialHash = window.location.hash;
+                if (initialHash) {
+                    updateSEOForRoute(initialHash);
+                }
+
+                // 2. Listen for hash changes (primary method for Flutter)
+                window.addEventListener("hashchange", function () {
+                    updateSEOForRoute(window.location.hash);
+                });
+
+                // 3. Listen for popstate events (browser back/forward buttons)
+                window.addEventListener("popstate", function () {
+                    // When using history.pushState, we need to reconstruct the hash
+                    const path = window.location.pathname;
+                    if (path !== "/") {
+                        updateSEOForRoute("#" + path);
+                    } else {
+                        updateSEOForRoute("");
+                    }
+                });
+
+                // 4. Monitor URL changes with MutationObserver as fallback
+                const observer = new MutationObserver(function (mutations) {
+                    mutations.forEach(function (mutation) {
+                        if (
+                            mutation.type === "attributes" &&
+                            mutation.attributeName === "href"
+                        ) {
+                            // Check if the hash has changed
+                            const currentHash = window.location.hash;
+                            if (currentHash !== currentRoute) {
+                                updateSEOForRoute(currentHash);
+                            }
+                        }
+                    });
+                });
+
+                // Start observing the document for URL changes
+                observer.observe(document, {
+                    attributes: true,
+                    subtree: true,
+                    attributeFilter: ["href"],
+                });
+
+                // 5. Periodic check as the final fallback
+                setInterval(function () {
+                    const currentHash = window.location.hash;
+                    if (currentHash !== currentRoute) {
+                        updateSEOForRoute(currentHash);
+                    }
+                }, 500);
+
+                // 6. Override history.pushState to capture programmatic navigation
+                const originalPushState = history.pushState;
+                history.pushState = function () {
+                    const result = originalPushState.apply(this, arguments);
+                    // After pushState, check if we need to update SEO
+                    const path = window.location.pathname;
+                    if (path !== "/") {
+                        updateSEOForRoute("#" + path);
+                    } else {
+                        updateSEOForRoute("");
+                    }
+                    return result;
+                };
+
+                // 7. Override history.replaceState as well
+                const originalReplaceState = history.replaceState;
+                history.replaceState = function () {
+                    const result = originalReplaceState.apply(this, arguments);
+                    // After replaceState, check if we need to update SEO
+                    const path = window.location.pathname;
+                    if (path !== "/") {
+                        updateSEOForRoute("#" + path);
+                    } else {
+                        updateSEOForRoute("");
+                    }
+                    return result;
+                };
+            }
+
+            // Initialize SEO handling when page loads
+            window.addEventListener("load", setupAutomaticRouteDetection);
+
+            // For Flutter to call when route changes (manual fallback)
+            window.updateFlutterSEO = function (route) {
+                updateSEOForRoute(route);
+            };
+        </script>
+    </head>
+    <body>
+        <!-- Professional Splash Screen -->
+        <div class="splash-container" id="splash">
+            <div class="splash-content">
+                <div class="logo-container">
+                    <div class="logo-circle">
+                        <span style="font-size: 3rem; font-weight: bold"
+                            >A</span
+                        >
+                    </div>
+                </div>
+
+                <h1 class="brand-name">VIBA</h1>
+                <p class="tagline">AFROBEAT • AMAPIANO • AFROPOP</p>
+
+                <div class="loading-bar">
+                    <div class="loading-progress"></div>
+                </div>
+
+                <div class="status-message" id="status">
+                    Loading experience...
+                </div>
+            </div>
+
+            <div class="splash-footer">
+                © 2025 Viba Music. All rights reserved.
+            </div>
+        </div>
+
+        <!-- Defer Flutter initialization -->
+        <script>
+            // Optimized loading sequence
+            window.addEventListener("DOMContentLoaded", () => {
+                // Simulate loading progress
+                const messages = [
+                    "Initializing platform...",
+                    "Loading music library...",
+                    "Preparing audio engine...",
+                    "Almost ready...",
+                    "Welcome to Amplify!",
+                ];
+
+                let messageIndex = 0;
+                const statusElement = document.getElementById("status");
+
+                // Update status messages
+                const messageInterval = setInterval(() => {
+                    if (messageIndex < messages.length) {
+                        statusElement.textContent = messages[messageIndex];
+                        messageIndex++;
+                    } else {
+                        clearInterval(messageInterval);
+                    }
+                }, 800);
+
+                // Load Flutter with optimized timing
+                setTimeout(() => {
+                    const flutterScript = document.createElement("script");
+                    flutterScript.src = "flutter_bootstrap.js";
+                    flutterScript.defer = true;
+                    document.body.appendChild(flutterScript);
+
+                    // Hide splash when Flutter is ready
+                    window.addEventListener("flutter-first-frame", () => {
+                        const splash = document.getElementById("splash");
+                        splash.style.opacity = "0";
+                        setTimeout(() => splash.remove(), 500);
+                    });
+                }, 1500);
+            });
+
+            // Handle URL variations for SEO
+            (function () {
+                const currentUrl = window.location.href;
+                const canonicalUrl = "https://amplifymusic.site/";
+
+                // Redirect trailing slash
+                if (
+                    window.location.pathname.endsWith("/") &&
+                    window.location.pathname !== "/"
+                ) {
+                    window.location.replace(currentUrl.replace(/\/$/, ""));
+                    return;
+                }
+
+                // Redirect hash fragments
+                if (
+                    window.location.hash &&
+                    window.location.hash.startsWith("#/")
+                ) {
+                    // Don't redirect immediately, let our SEO handler process it
+                    return;
+                }
+            })();
+        </script>
+    </body>
+</html>

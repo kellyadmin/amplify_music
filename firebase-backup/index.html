@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="/">
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    <meta name="theme-color" content="#000000">
+
+    <meta name="6a97888e-site-verification" content="097945cdc1806e637205cad4c153e834">
+
+    <meta http-equiv="Delegate-CH" content="Sec-CH-UA https://s.magsrv.com; Sec-CH-UA-Mobile https://s.magsrv.com; Sec-CH-UA-Arch https://s.magsrv.com; Sec-CH-UA-Model https://s.magsrv.com; Sec-CH-UA-Platform https://s.magsrv.com; Sec-CH-UA-Platform-Version https://s.magsrv.com; Sec-CH-UA-Bitness https://s.magsrv.com; Sec-CH-UA-Full-Version-List https://s.magsrv.com; Sec-CH-UA-Full-Version https://s.magsrv.com;">
+
+    <title>Amplify Music – Stream & Download Afrobeat Hits</title>
+    <meta name="description" content="Amplify Music: Premium Afrobeat, Amapiano & Afropop streaming platform. Discover, stream and download the hottest African music hits.">
+    <link rel="canonical" href="https://amplifymusic.site/" id="canonical-url" />
+    <meta name="robots" content="index, follow" />
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://amplifymusic.site/" id="og-url">
+    <meta property="og:title" content="Amplify Music – Stream Afrobeat Hits" id="og-title">
+    <meta property="og:description" content="Premium African music streaming platform. Discover the best Afrobeat, Amapiano & Afropop hits." id="og-description">
+    <meta property="og:image" content="https://amplifymusic.site/icons/social-preview.png" id="og-image">
+
+    <style>
+        /* Ultra-professional design system with advanced visual effects */
+        :root {
+            --primary-yellow: #FFD700;
+            --accent-yellow: #FFC107;
+            --light-yellow: #FFF8E1;
+            --pure-black: #000000;
+            --deep-black: #0A0A0A;
+            --rich-black: #121212;
+            --dark-gray: #1A1A1A;
+            --medium-gray: #2A2A2A;
+            --light-gray: #888888;
+            --pure-white: #FFFFFF;
+            --off-white: #F5F5F5;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            background-color: var(--pure-black);
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: var(--pure-white);
+            line-height: 1.6;
+        }
+
+        .splash-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, var(--rich-black) 0%, var(--pure-black) 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        /* Ad Container Styles (YouTube-like Overlay) */
+        #ad-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            z-index: 2000; /* Above splash content */
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #ad-video-element {
+            width: 100%;
+            height: 100%;
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        /* Advanced background with multiple layers */
+        .splash-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                linear-gradient(rgba(255, 215, 0, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 215, 0, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        /* Animated gradient overlay */
+        .gradient-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(255, 215, 0, 0.05) 0%, transparent 70%);
+            animation: pulseGradient 8s ease-in-out infinite alternate;
+            pointer-events: none;
+        }
+
+        .splash-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 400px;
+            width: 90%;
+            padding: 40px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo-container {
+            margin-bottom: 40px;
+            position: relative;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        /* Advanced logo with multiple layers and effects */
+        .logo-circle {
+            width: 160px;
+            height: 160px;
+            background: linear-gradient(135deg, var(--primary-yellow) 0%, var(--accent-yellow) 100%);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow:
+                0 15px 50px rgba(255, 215, 0, 0.4),
+                0 0 0 1px rgba(255, 215, 0, 0.1),
+                inset 0 2px 4px rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .logo-circle:hover {
+            transform: scale(1.05) translateY(-3px);
+            box-shadow:
+                0 20px 60px rgba(255, 215, 0, 0.5),
+                0 0 0 2px rgba(255, 215, 0, 0.2);
+        }
+
+        /* Rotating ring with gradient */
+        .logo-circle::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(
+                from 0deg,
+                transparent,
+                rgba(255, 215, 0, 0.15),
+                transparent,
+                rgba(255, 215, 0, 0.1),
+                transparent
+            );
+            border-radius: 50%;
+            z-index: -1;
+            animation: rotate 8s linear infinite;
+        }
+
+        /* Inner shine effect */
+        .logo-circle::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            right: 2px;
+            bottom: 2px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, transparent 60%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        /* Shining overlay effect */
+        .shine-effect {
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            transform: skewX(-25deg);
+            animation: shine 3s infinite;
+        }
+
+        .logo-letter {
+            color: var(--pure-black);
+            font-family: 'Playfair Display', 'Times New Roman', serif;
+            font-size: 5.5rem;
+            font-weight: 900;
+            line-height: 1;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 2;
+        }
+
+        .brand-container {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+
+        .brand-name {
+            color: var(--pure-white);
+            font-size: 3.2rem;
+            font-weight: 900;
+            margin: 0;
+            letter-spacing: 10px;
+            text-transform: uppercase;
+            position: relative;
+            display: inline-block;
+        }
+
+        /* Enhanced underline with gradient and glow */
+        .brand-name::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary-yellow), var(--accent-yellow));
+            border-radius: 2.5px;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        .tagline {
+            color: var(--primary-yellow);
+            font-size: 0.75rem;
+            margin-top: 24px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            font-weight: 700;
+            opacity: 0.9;
+            position: relative;
+        }
+
+        .tagline span {
+            position: relative;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .tagline span:hover {
+            color: var(--pure-white);
+            transform: translateY(-2px);
+        }
+
+        .tagline span::after {
+            content: '•';
+            position: absolute;
+            right: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--light-gray);
+            font-size: 0.6rem;
+        }
+
+        .tagline span:last-child::after {
+            display: none;
+        }
+
+        .loading-container {
+            width: 100%;
+            margin-top: 50px;
+            animation: fadeInUp 0.8s ease-out 0.4s both;
+        }
+
+        .loading-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .loading-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--light-gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .loading-percentage {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--primary-yellow);
+            font-variant-numeric: tabular-nums;
+            text-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
+        }
+
+        .loading-bar {
+            width: 100%;
+            height: 10px;
+            background-color: var(--medium-gray);
+            border-radius: 50px; /* Adjusted to match progress radius */
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .loading-progress {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary-yellow), var(--accent-yellow));
+            animation: loading 3s infinite cubic-bezier(0.4, 0.0, 0.2, 1);
+            border-radius: 5px;
+            position: relative;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+        }
+
+        /* Enhanced shimmer effect */
+        .loading-progress::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        .status-message {
+            color: var(--light-gray);
+            margin-top: 20px;
+            font-size: 0.85rem;
+            font-weight: 400;
+            text-align: center;
+            min-height: 24px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            background-color: var(--primary-yellow);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .splash-footer {
+            position: absolute;
+            bottom: 30px;
+            color: var(--light-gray);
+            font-size: 0.7rem;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            opacity: 0.7;
+            animation: fadeIn 1s ease-out 0.8s both;
+        }
+
+        #flutter-app {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.8s ease-in;
+        }
+
+        /* Start Button for Ads */
+        .start-btn {
+            background: linear-gradient(135deg, var(--primary-yellow), var(--accent-yellow));
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            color: var(--pure-black);
+            font-weight: 800;
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-top: 30px;
+            display: none; /* Hidden until loaded */
+            animation: fadeInUp 0.5s ease-out;
+            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(255, 215, 0, 0.5);
+        }
+
+        /* Enhanced decorative elements */
+        .decorative-element {
+            position: absolute;
+            pointer-events: none;
+            opacity: 0.15;
+        }
+
+        .circle-decoration {
+            width: 500px;
+            height: 500px;
+            border: 1px solid var(--primary-yellow);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: rotate 60s linear infinite;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.1);
+        }
+
+        .square-decoration {
+            width: 250px;
+            height: 250px;
+            border: 1px solid var(--primary-yellow);
+            top: 10%;
+            right: 10%;
+            animation: rotate 45s linear infinite reverse;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.1);
+        }
+
+        .triangle-decoration {
+            width: 0;
+            height: 0;
+            border-left: 100px solid transparent;
+            border-right: 100px solid transparent;
+            border-bottom: 173px solid rgba(255, 215, 0, 0.1);
+            bottom: 15%;
+            left: 10%;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        /* Particle effects */
+        .particle {
+            position: absolute;
+            background-color: var(--primary-yellow);
+            border-radius: 50%;
+            opacity: 0;
+            animation: floatParticle 10s infinite;
+        }
+
+        /* Advanced animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes loading {
+            0% { width: 0%; margin-left: 0%; }
+            50% { width: 70%; margin-left: 15%; }
+            100% { width: 0%; margin-left: 100%; }
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+
+        @keyframes shine {
+            0% { left: -100%; }
+            20% { left: 100%; }
+            100% { left: 100%; }
+        }
+
+        @keyframes pulseGradient {
+            0% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+            100% { opacity: 0.3; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        @keyframes floatParticle {
+            0% {
+                opacity: 0;
+                transform: translateY(100px) scale(0);
+            }
+            10% {
+                opacity: 0.4;
+                transform: translateY(80px) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100px) scale(0.5);
+            }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            .brand-name {
+                font-size: 2.6rem;
+                letter-spacing: 6px;
+            }
+
+            .logo-circle {
+                width: 140px;
+                height: 140px;
+            }
+
+            .logo-letter {
+                font-size: 4.8rem;
+            }
+
+            .tagline {
+                font-size: 0.65rem;
+                letter-spacing: 3px;
+            }
+
+            .splash-content {
+                padding: 30px;
+            }
+        }
+
+        /* Professional loading states */
+        .loading-states {
+            display: none;
+        }
+
+        .error-state .status-indicator {
+            background-color: #FF5252;
+            animation: none;
+        }
+
+        .error-state .status-message {
+            color: #FF5252;
+        }
+
+        .success-state .status-indicator {
+            background-color: #4CAF50;
+        }
+    </style>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet" onerror="console.warn('Google Fonts failed to load')">
+
+    <script src="https://cdn.ably.com/lib/ably.min-1.js" onerror="console.warn('Ably SDK failed to load')"></script>
+    <script src="ably_wrapper.js"></script>
+
+    <script src="https://meet.jit.si/external_api.js" type="application/javascript" onerror="console.warn('Jitsi API failed to load')"></script>
+
+    <script src="//imasdk.googleapis.com/js/sdkloader/ima3.js" onerror="console.warn('IMA SDK failed to load')"></script>
+
+    <script>
+        window.prerenderReady = false;
+
+        // Helper to check if the current request is from a known bot (based on user-agent detection in your Prerender middleware)
+        function isBotRequest() {
+            // Your Prerender middleware must ensure this flag is set for bots.
+            // If you are using Prerender.io middleware, it usually relies on the User-Agent string (Googlebot, Bingbot, etc.)
+            // We use the presence of the Prerender service's own User Agent string here as a simplified fallback.
+            var userAgent = navigator.userAgent.toLowerCase();
+            return userAgent.includes('googlebot') || userAgent.includes('bingbot') || userAgent.includes('facebookexternalhit') || userAgent.includes('prerender');
+        }
+    </script>
+</head>
+<body>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-messaging-compat.js"></script>
+<script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBVsKhcZjXsUaJYE2q4DOaNCKSylLNOaas",
+      authDomain: "amplifymusic-c0035.firebaseapp.com",
+      projectId: "amplifymusic-c0035",
+      storageBucket: "amplifymusic-c0035.firebasestorage.app",
+      messagingSenderId: "196671810782",
+      appId: "1:196671810782:web:d4dab806839de7bfa1664f",
+      measurementId: "G-H65Q4LPMEN"
+    };
+
+    // Initialize Firebase
+    try {
+        firebase.initializeApp(firebaseConfig);
+        console.log("🔥 Firebase initialized successfully in index.html");
+    } catch (e) {
+        console.error("🔥 Firebase initialization failed:", e);
+    }
+</script>
+<div id="ad-overlay">
+    <div id="ad-container" style="position: relative; width: 100%; height: 100%;">
+        <video id="ad-video-element" style="width:100%; height:100%; background: black;"></video>
+    </div>
+</div>
+
+<div class="splash-container" id="splash">
+    <div class="gradient-overlay"></div>
+
+    <div class="decorative-element circle-decoration"></div>
+    <div class="decorative-element square-decoration"></div>
+    <div class="decorative-element triangle-decoration"></div>
+
+    <div id="particles-container"></div>
+
+    <div class="splash-content">
+        <div class="logo-container">
+            <div class="logo-circle">
+                <div class="shine-effect"></div>
+                <span class="logo-letter">A</span>
+            </div>
+        </div>
+
+        <div class="brand-container">
+            <h1 class="brand-name">AMPLIFY</h1>
+            <p class="tagline">
+                <span>MUSIC</span>
+                <span>VIDEO</span>
+                <span>COMMUNITY</span>
+            </p>
+        </div>
+
+        <div class="loading-container" id="loading-ui">
+            <div class="loading-header">
+                <span class="loading-label">Initializing</span>
+                <span class="loading-percentage" id="loading-percentage">0%</span>
+            </div>
+            <div class="loading-bar">
+                <div class="loading-progress" id="loading-progress"></div>
+            </div>
+            <div class="status-message" id="status">
+                <span class="status-indicator"></span>
+                <span id="status-text">Starting high-fidelity audio engine...</span>
+            </div>
+        </div>
+
+        <button id="start-btn" class="start-btn">START LISTENING</button>
+    </div>
+
+    <div class="splash-footer">
+        © 2025 Amplify Music. All rights reserved. | Premium African Music Streaming Platform
+    </div>
+</div>
+
+<div id="flutter-app">
+</div>
+
+<script>
+    // Global Variables for Ad Logic
+    var adsManager;
+    var adsLoader;
+    var adDisplayContainer;
+    var videoContent;
+    var appIsReady = false;
+    var adIsPlaying = false;
+    // YOUR VAST URL
+    var VAST_TAG_URL = 'https://s.magsrv.com/v1/vast.php?idzone=5786972';
+
+    function launchFlutterApp() {
+        console.log("🚀 Launching Flutter App");
+
+        // PRERENDER LOGIC: Signal readiness when the app actually launches.
+        window.prerenderReady = true;
+
+        const splash = document.getElementById('splash');
+        const flutterApp = document.getElementById('flutter-app');
+        const adOverlay = document.getElementById('ad-overlay');
+
+        if (adOverlay) adOverlay.style.display = 'none';
+
+        if (splash && flutterApp) {
+             // Create a fade overlay for a smoother transition
+             const fadeOverlay = document.createElement('div');
+                fadeOverlay.style.position = 'absolute';
+                fadeOverlay.style.top = '0';
+                fadeOverlay.style.left = '0';
+                fadeOverlay.style.width = '100%';
+                fadeOverlay.style.height = '100%';
+                fadeOverlay.style.backgroundColor = '#000';
+                fadeOverlay.style.opacity = '0';
+                fadeOverlay.style.transition = 'opacity 0.8s ease-in';
+                fadeOverlay.style.zIndex = '9999';
+
+                splash.appendChild(fadeOverlay);
+
+                // Fade in the overlay
+                setTimeout(() => {
+                    fadeOverlay.style.opacity = '1';
+                }, 100);
+
+                // After overlay is fully visible, transition to Flutter app
+                setTimeout(() => {
+                    splash.style.display = 'none';
+                    flutterApp.style.opacity = '1';
+                }, 900);
+        }
+    }
+
+    // 1. Function called by Flutter when it's ready
+    window.flutterAppReady = function() {
+        console.log('✅ Flutter App Core Loaded.');
+        appIsReady = true;
+
+        // PRERENDER LOGIC: If it's a bot, bypass the click/ad sequence and launch immediately.
+        if (isBotRequest()) {
+            console.log('🤖 Bot detected, bypassing click and ad sequence to launch app.');
+            launchFlutterApp();
+            return;
+        }
+
+        // Show Start Button to user (Browser requires interaction for audio/video)
+        document.getElementById('loading-ui').style.display = 'none';
+        const startBtn = document.getElementById('start-btn');
+        startBtn.style.display = 'block';
+
+        startBtn.onclick = function() {
+            startBtn.style.display = 'none';
+            document.getElementById('status-text').textContent = "Loading Ad Content...";
+            initAdPlayer();
+        };
+    };
+
+    // 2. Initialize the Google IMA SDK
+    function initAdPlayer() {
+        console.log("Initializing Ad Player...");
+        videoContent = document.getElementById('ad-video-element');
+        var adContainer = document.getElementById('ad-container');
+
+        // Safety: If IMA SDK failed to load (adblock), skip to app
+        if (typeof google === 'undefined' || !google.ima) {
+            console.warn("IMA SDK not loaded (AdBlock?). Launching app.");
+            launchFlutterApp();
+            return;
+        }
+
+        adDisplayContainer = new google.ima.AdDisplayContainer(adContainer, videoContent);
+        // Must be done as the result of a user action on mobile
+        adDisplayContainer.initialize();
+
+        adsLoader = new google.ima.AdsLoader(adDisplayContainer);
+
+        // Add event listeners
+        adsLoader.addEventListener(
+            google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED,
+            onAdsManagerLoaded,
+            false);
+        adsLoader.addEventListener(
+            google.ima.AdErrorEvent.Type.AD_ERROR,
+            onAdError,
+            false);
+
+        // Request ads
+        var adsRequest = new google.ima.AdsRequest();
+        adsRequest.adTagUrl = VAST_TAG_URL;
+
+        // Specify the linear and nonlinear slot sizes. This helps the SDK to
+        // select the correct creative if multiple are returned.
+        adsRequest.linearAdSlotWidth = window.innerWidth;
+        adsRequest.linearAdSlotHeight = window.innerHeight;
+        adsRequest.nonLinearAdSlotWidth = window.innerWidth;
+        adsRequest.nonLinearAdSlotHeight = window.innerHeight / 3;
+
+        adsLoader.requestAds(adsRequest);
+    }
+
+    function onAdsManagerLoaded(adsManagerLoadedEvent) {
+        // Instantiate the AdsManager to the adDisplayContainer object.
+        var adsRenderingSettings = new google.ima.AdsRenderingSettings();
+        adsManager = adsManagerLoadedEvent.getAdsManager(videoContent, adsRenderingSettings);
+
+        // Add event listeners for the required events.
+        adsManager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, onAdError);
+        adsManager.addEventListener(google.ima.AdEvent.Type.CONTENT_PAUSE_REQUESTED, onContentPauseRequested);
+        adsManager.addEventListener(google.ima.AdEvent.Type.CONTENT_RESUME_REQUESTED, onContentResumeRequested);
+        adsManager.addEventListener(google.ima.AdEvent.Type.ALL_ADS_COMPLETED, onAdEvent);
+        adsManager.addEventListener(google.ima.AdEvent.Type.LOADED, onAdEvent);
+        adsManager.addEventListener(google.ima.AdEvent.Type.STARTED, onAdEvent);
+        adsManager.addEventListener(google.ima.AdEvent.Type.COMPLETE, onAdEvent);
+
+        try {
+            // Show the ad overlay
+            document.getElementById('ad-overlay').style.display = 'flex';
+            // Initialize the ads manager. Ad rules playlist will start at this time.
+            adsManager.init(window.innerWidth, window.innerHeight, google.ima.ViewMode.NORMAL);
+            // Call play to start showing the ad. Single video and overlay ads will
+            // start at this time; the call will be ignored for ad rules.
+            adsManager.start();
+        } catch (adError) {
+            // An error may be thrown if there was a problem with the VAST response.
+            onAdError(adError);
+        }
+    }
+
+    function onAdEvent(adEvent) {
+        // Retrieve the ad from the event. Some events (e.g. ALL_ADS_COMPLETED)
+        // don't have ad object associated.
+        var ad = adEvent.getAd();
+        switch (adEvent.type) {
+            case google.ima.AdEvent.Type.LOADED:
+                // This is the first event sent for an ad - it is possible to
+                // determine whether the ad is a video ad or an overlay.
+                if (!ad.isLinear()) {
+                    // Position AdDisplayContainer correctly for overlay.
+                    // Use ad.width and ad.height.
+                    videoContent.play();
+                }
+                break;
+            case google.ima.AdEvent.Type.STARTED:
+                // This event indicates the ad has started - the video player
+                // performs this, so we don't need to do anything.
+                break;
+            case google.ima.AdEvent.Type.COMPLETE:
+                // This event indicates the ad has finished.
+                launchFlutterApp();
+                break;
+            case google.ima.AdEvent.Type.ALL_ADS_COMPLETED:
+                // This event indicates that all ads have finished.
+                launchFlutterApp();
+                break;
+        }
+    }
+
+    function onAdError(adErrorEvent) {
+        // Handle the error logging.
+        console.log("Ad Error: " + adErrorEvent.getError());
+        if(adsManager) adsManager.destroy();
+        // Fallback: Launch app immediately if ad fails
+        launchFlutterApp();
+    }
+
+    function onContentPauseRequested() {
+        // This function is where you should setup UI for showing ads (e.g.
+        // display ad timer countdown, disable seeking etc.)
+        // setupUIForAds();
+    }
+
+    function onContentResumeRequested() {
+        // This function is where you should ensure that your UI is ready
+        // to play content.
+        launchFlutterApp();
+    }
+
+    // Window Resize Handling for Ads
+    window.addEventListener('resize', function() {
+        if(adsManager) {
+            adsManager.resize(window.innerWidth, window.innerHeight, google.ima.ViewMode.NORMAL);
+        }
+    });
+
+    // 2. Create particle effects (Existing Code)
+    function createParticles() {
+        const container = document.getElementById('particles-container');
+        const particleCount = 20;
+
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            const size = Math.random() * 2 + 2;
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            const posX = Math.random() * 100;
+            const posY = Math.random() * 100;
+            particle.style.left = `${posX}%`;
+            particle.style.top = `${posY}%`;
+            const delay = Math.random() * 10;
+            particle.style.animationDelay = `${delay}s`;
+            container.appendChild(particle);
+        }
+    }
+
+    // 3. Load Flutter bootstrap script when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🌐 DOM Content Loaded. Starting Amplify Music...');
+        createParticles();
+
+        // Enhanced loading sequence
+        const loadingSteps = [
+            { status: 'Initializing audio components...', progress: 15 },
+            { status: 'Connecting to music servers...', progress: 30 },
+            { status: 'Loading high-quality codecs...', progress: 45 },
+            { status: 'Preparing streaming infrastructure...', progress: 60 },
+            { status: 'Optimizing user experience...', progress: 75 },
+            { status: 'Finalizing setup...', progress: 90 }
+        ];
+
+        let currentStep = 0;
+        const statusElement = document.getElementById('status-text');
+        const percentageElement = document.getElementById('loading-percentage');
+
+        const updateLoadingStatus = () => {
+            if (currentStep < loadingSteps.length) {
+                const step = loadingSteps[currentStep];
+                statusElement.textContent = step.status;
+                percentageElement.textContent = step.progress + '%';
+                percentageElement.style.textShadow = '0 0 10px rgba(255, 215, 0, 0.6)';
+                setTimeout(() => {
+                    percentageElement.style.textShadow = '0 0 5px rgba(255, 215, 0, 0.3)';
+                }, 300);
+                currentStep++;
+                setTimeout(updateLoadingStatus, 700);
+            }
+        };
+
+        // Start the loading sequence
+        setTimeout(updateLoadingStatus, 500);
+
+        // Load Flutter bootstrap script
+        const script = document.createElement('script');
+        script.src = 'flutter_bootstrap.js';
+        script.async = true;
+
+        script.onload = function() {
+            console.log('✅ Flutter bootstrap script loaded');
+            statusElement.textContent = 'Ready to launch...';
+            percentageElement.textContent = '100%';
+            // Note: window.flutterAppReady is called by flutter logic usually,
+            // but if testing locally without flutter logic, you might need to uncomment:
+            // window.flutterAppReady();
+        };
+
+        script.onerror = function() {
+            console.error('❌ Failed to load Flutter bootstrap script');
+            document.getElementById('splash').classList.add('error-state');
+            statusElement.textContent = 'Startup Failed. Please check your connection and refresh.';
+            percentageElement.textContent = 'ERROR';
+        };
+
+        document.body.appendChild(script);
+    });
+</script>
+<div style="position: absolute; left: -9999px; top: -9999px; opacity: 0;">
+    <h1>Amplify Music Navigation Links</h1>
+    <ul>
+        <li><a href="/songs/">Afrobeat Songs & Albums</a></li>
+        <li><a href="/news/">Latest Music News & Updates</a></li>
+        <li><a href="/videos/">Official Music Videos & Live Performances</a></li>
+        <li><a href="/community/">Artist & Fan Community Hub</a></li>
+        <li><a href="/privacy/">Privacy Policy</a></li>
+    </ul>
+</div>
+</body>
+</html>
