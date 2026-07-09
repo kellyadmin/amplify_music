@@ -62,31 +62,31 @@ logcat_output.txt
 *.tmp
 *.TMP
 *~RF*.TMP
-node_modules
-node_modules
-node_modules
-node_modules
-node_modules
-node_modules
-node_modules
-node_modules
-node_modules
-node_modules
-node_modules
-node_modules
-node_modules
-node_modules
-node_modules
-node_modules
-node_modules
-node_modules
-node_modules
-node_modules
-node_modules
-node_modules
-node_modules
-node_modules
-node_modules
-node_modules
-node_modules
-node_modules
+
+# Large media files (keep on PC only, don't push to GitHub)
+# Audio files
+assets/audio/*.mp3
+assets/audio/*.wav
+assets/audio/*.m4a
+*.mp3
+*.wav
+*.m4a
+
+# Large image files
+assets/images/*.png
+assets/images/*.jpg
+assets/images/*.jpeg
+*.png
+*.jpg
+*.jpeg
+
+# Large JavaScript build files
+firebase-backup/main.dart.js
+deployed_main.dart.js
+web/main.dart.js
+*.dart.js
+
+# Web audio files
+web/*.mp3
+web/*.wav
+web/*.m4a
